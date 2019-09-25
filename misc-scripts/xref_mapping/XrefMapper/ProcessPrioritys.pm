@@ -91,7 +91,7 @@ sub process {
     print "\t$name\n" if($self->verbose);
   }
 
-  my $update_ox_sth = $dbi->prepare('update object_xref set ox_status = "FAILED_PRIORITY" where object_xref_id = ?');
+  my $update_ox_sth = $dbi->prepare('update ignore object_xref set ox_status = "FAILED_PRIORITY" where object_xref_id = ?');
   my $update_x_sth  = $dbi->prepare("update xref set dumped = 'NO_DUMP_ANOTHER_PRIORITY' where xref_id = ?");
 
   # 1) Set to failed all those that have no object xrefs.

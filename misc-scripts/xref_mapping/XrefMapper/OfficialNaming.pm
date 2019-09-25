@@ -957,7 +957,7 @@ sub find_from_other_sources{
 sub get_delete_odn_sth{
   my ($self, $dbi) = @_;
 
-  my $sth = $dbi->prepare('UPDATE object_xref SET ox_status = "MULTI_DELETE" where object_xref_id = ?');
+  my $sth = $dbi->prepare('UPDATE IGNORE object_xref SET ox_status = "MULTI_DELETE" where object_xref_id = ?');
   return $sth;
 }
 
