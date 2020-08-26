@@ -171,6 +171,7 @@ sub _slice_feature_cache {
   return if $self->db()->no_cache();
   if(! exists $self->{_slice_feature_cache}) {
     tie my %cache, 'Bio::EnsEMBL::Utils::Cache', $SLICE_FEATURE_CACHE_SIZE;
+
     $self->{_slice_feature_cache} = \%cache;
   }
   return $self->{_slice_feature_cache};
@@ -456,6 +457,8 @@ sub fetch_all_by_Slice_constraint {
     }
 
     $cache = $self->_slice_feature_cache();
+    
+    
     if ( exists( $cache->{$key} ) ) {
       # Clear the bound parameters and return the cached data.
       $self->{'_bind_param_generic_fetch'} = ();
@@ -464,6 +467,10 @@ sub fetch_all_by_Slice_constraint {
       #           this for so long people are expecting multiple calls
       #           to fetch_by_SliceXXXXX() methods to return the same
       #           array reference.
+      use Data::Dumper;
+      print("================STABLE ID RETURNED FROM CACHE ================\n");
+      print(Dumper($cache->{$key}->[0]->stable_id));
+      print(Dumper($cache->{$key}->[1]->stable_id));
       return $cache->{$key};
     }
   } ## end if ( !( defined( $self...)))
@@ -511,7 +518,7 @@ sub fetch_all_by_Slice_constraint {
   if ( defined($key) ) {
     $cache->{$key} = \@result;
   }
-
+  print("================STABLE ID NOT !!!! FROM CACHE ================\n");
   return \@result;
 } ## end sub fetch_all_by_Slice_constraint
 
@@ -892,8 +899,18 @@ COORD_SYSTEM: foreach my $coord_system (@feature_coord_systems) {
            push @pan_coord_features, $self->generic_count($local_constraint);
          } 
          else {
+             print("^^^^^^^^^^^^^^^^^^^^^^^^^^^ GET F FROM HERE ^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n");
+
              my $features = $self->generic_fetch( $local_constraint, $local_mapper, $local_slice );
+             use Data::Dumper;
+             print(" WRONG LIST, TRY REMAP");
+             if (@$features[0]) {
+              print(Dumper(@$features[0]->stable_id));
+             }
+            
+             
              $features = $self->_remap( $features, $local_mapper, $local_slice );
+             
              push @pan_coord_features, @$features;
          }
      }

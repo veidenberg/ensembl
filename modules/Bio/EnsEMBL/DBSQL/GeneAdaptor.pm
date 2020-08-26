@@ -2082,7 +2082,8 @@ sub fetch_all_by_transcript_supporting_evidence {
          AND t.transcript_id = sf.transcript_id
          AND sf.feature_id = f.${feature_type}_id
          AND sf.feature_type = ?
-         AND f.hit_name=?
+         AND 
+         f.hit_name=?
          $anal_where
   );
 

@@ -128,6 +128,7 @@ entry to the end of the linked list internally.
 =cut
 
 sub TIEHASH {
+    print("~~~~~~~~~~~~~~~~~~~~TIE HASH~~~~~~~~~~~~~~~~\n");
     my($class, $max_count, $options) = @_;
 
     if(ref($max_count)) {
@@ -208,6 +209,7 @@ sub read { undef; }
 #}
 
 sub FETCH {
+    ("~~~~~~~~~~~~~~~~~~~~FETCH~~~~~~~~~~~~~~~~\n");
     my($self, $key) = @_;
 
     my $node = $self->{nodes}{$key};
@@ -276,10 +278,35 @@ sub FETCH {
 }
 
 sub STORE {
+    ("~~~~~~~~~~~~~~~~~~~~STORE~~~~~~~~~~~~~~~~\n");
     my($self, $key, $value) = @_;
     my $node;
+    use Data::Dumper;
+    
+    if((ref $value) eq 'ARRAY') {
+     if (ref @$value[0] eq 'Bio::EnsEMBL::Gene') {
+      use Devel::StackTrace;
+      my $trace = Devel::StackTrace->new;
+      print $trace->as_string;
+      print("~~~~~~~~~~~~~~~~~~~~~~~~ STORED IDS ~~~~~~~~~~~~~~~~~~~~~~~~~\n");
 
-    $self->print("STORE [$key,$value]") if ($self->{dbg} > 1);
+      
+      foreach ( @$value ) {
+       if ($_) {
+      	 	my $xref;
+       	if ($_->display_xref()) {
+        	$xref = $_->display_xref()->dbID();
+        	}
+		print $_->dbID . ' ' . $_->stable_id . ' ' . $_->dbID() . ' ' . $_->external_db() . ' ' . $xref . "\n";
+	}
+      }
+	
+     }
+    } else  {
+     if (ref $value eq 'Bio::EnsEMBL::Gene') {
+       $self->print("STORE [$key, " . Dumper(ref $value->stable_id) . "]");
+     }
+    }
 
     # do not cache undefined values
     defined($value) || return(undef);
@@ -287,10 +314,12 @@ sub STORE {
     # check max size of entry, that it not exceed max size
     my $length;
     if($self->{max_size}) {
+    	("====================MAX SIZE================\n");
 	$length = &_get_data_length(\$key, \$value);
 	if($length > $self->{max_size}) {
 	    if ($self->{subclass}) {
-		$self->print("direct write() [$key, $value]") if ($self->{dbg} > 1);
+	    	
+		$self->print("direct write() [$key, Dumper($value)]");
 		$self->write($key, $value);
 	    }
 	    return $value;
@@ -299,6 +328,7 @@ sub STORE {
 
     # do we have node already ?
     if($self->{nodes}{$key}) {
+    	print ("============= DELETE EXISTING =========");
 	$node = &delete($self, $key);
 #	$node = &delete($self, $key);
 #	$node->[$VALUE] = $value;
@@ -309,7 +339,7 @@ sub STORE {
     $node = &create_node($self, \$key, \$value, $length);
 #    $node ||= &create_node($self, \$key, \$value, $length);
     &insert($self, $node);
-
+  
     # if the data is sync'd call write now, otherwise defer the data
     # writing, but mark it dirty so it can be cleanup up at the end
     if ($self->{subclass}) {
@@ -325,6 +355,7 @@ sub STORE {
 }
 
 sub DELETE {
+	("~~~~~~~~~~~~~~~~~~~~DELETE KEY~~~~~~~~~~~~~~~~\n");
     my($self, $key) = @_;
 
     $self->print("DELETE $key") if ($self->{dbg} > 1);
@@ -333,6 +364,7 @@ sub DELETE {
 }
 
 sub CLEAR {
+    ("~~~~~~~~~~~~~~~~~~~~CLEAR~~~~~~~~~~~~~~~~\n");
     my($self) = @_;
 
     $self->print("CLEAR CACHE") if ($self->{dbg} > 1);
@@ -351,6 +383,7 @@ sub CLEAR {
 }
 
 sub EXISTS {
+    ("~~~~~~~~~~~~~~~~~~~~EXIST~~~~~~~~~~~~~~~~\n");
     my($self, $key) = @_;
     exists $self->{nodes}{$key};
 }
@@ -382,7 +415,7 @@ sub NEXTKEY {
 
 sub DESTROY {
     my($self) = @_;
-
+    ("~~~~~~~~~~~~~~~~~~~~DESTROY~~~~~~~~~~~~~~~~\n");
     # if debugging, snapshot cache before clearing
     if($self->{dbg}) {
 	if($self->{hit} || $self->{miss}) {
@@ -464,6 +497,7 @@ sub _get_data_length {
 }
 
 sub insert {
+ 	("~~~~~~~~~~~~~~~~~~~~ INSERT ~~~~~~~~~~~~~~~~\n");
     my($self, $new_node) = @_;
     
     $new_node->[$AFTER] = 0;
@@ -510,6 +544,7 @@ sub insert {
 }
 
 sub delete {
+	("~~~~~~~~~~~~~~~~~~~~<DELETE>~~~~~~~~~~~~~~~~\n");
     my($self, $key) = @_;    
     my $node = $self->{nodes}{$key} || return;
 #    return unless $node;
@@ -540,6 +575,7 @@ sub delete {
 }
 
 sub flush {
+    ("~~~~~~~~~~~~~~~~~~~~FLUSH~~~~~~~~~~~~~~~~\n");
     my $self = shift;
 
     $self->print("FLUSH CACHE") if ($self->{dbg} > 1);

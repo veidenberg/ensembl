@@ -526,15 +526,23 @@ ok(($genes[0]->stable_id() eq 'ENSG00000174873') || ($genes[1]->stable_id() eq '
 # test GeneAdaptor::fetch_all_by_external_name
 #
 
+print("======= START TESTING WHY CACHE CHANGED, THEY ARE CORRECT NOW:================\n");
+print($genes[0]->stable_id() . "\n");
+
 #Q15691
 ($gene) = @{$ga->fetch_all_by_external_name('MAE1_HUMAN')};
+print("=======  CHANGED, AFTER FETCH:================\n");
+print($genes[0]->stable_id() . "\n");
 debug($gene->stable_id);
 ok($gene->stable_id() eq 'ENSG00000101367');
 
 #
 # test GeneAdaptor::fetch_all_by_Slice
 #
+
 @genes = @{ $ga->fetch_all_by_Slice($slice) };
+print("======= AND HERE LAST FETCH WHEN THEY MUST BE EXPECTED:================\n");
+print($genes[0]->stable_id() . "\n");
 is(scalar(@genes), 19, "Found 19 genes with fetch_all_by_Slice");
 is($genes[0]->stable_id(), 'ENSG00000131044', "First gene is ENSG00000131044");
 is($genes[1]->stable_id(), 'ENSG00000174873', "Second gene is ENSG00000174873");
@@ -544,6 +552,10 @@ is($genes[1]->stable_id(), 'ENSG00000174873', "Second gene is ENSG00000174873");
 #
 @genes = @{ $ga->fetch_all_by_Slice_and_external_dbname_link($slice, undef, 0, "HUGO") };
 is(scalar(@genes), 13, "Found 13 genes with fetch_all_by_Slice_and_external_dbname_link");
+warn("TEST LIST");
+warn($genes[0]->stable_id() . ' ' . $genes[0]->dbID() . ' ' . $genes[0]->external_db () . ' ' . $genes[0]->display_xref() );
+
+
 is($genes[0]->stable_id(), 'ENSG00000131044', "First gene is ENSG00000131044");
 is($genes[1]->stable_id(), 'ENSG00000088356', "Second gene is ENSG00000088356");
 
