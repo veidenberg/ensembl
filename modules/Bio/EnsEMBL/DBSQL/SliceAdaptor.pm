@@ -233,57 +233,7 @@ sub fetch_by_region {
 
         # set the 'chromosome' alias, if not yet set
         $cs = $self->create_chromosome_alias();
-
-        # print Dumper( $self->{'karyotype_cache'} );
-
-        # where the requested seg_region_name does not exist, look for synonym/fuzzy match
-        if ( ! exists $cs->{'karyotype_cache'}{$seq_region_name} ) {
-
-          # print "The requested seq_region_name ('$seq_region_name') does not exist in this coordinate system.\n";
-          # print "Look for a synonymous seq_region_name that could be used...\n";
-          # return slice object if match a synonym
-          my $slice = $self->fetch_by_seq_region_synonym( $cs, $seq_region_name, $start, $end, $strand, $version, $no_fuzz );
-
-          # check whether any slice data has been returned
-          if ( $slice && $slice->seq_region_name ) {
-
-            my $matched_name = $slice->seq_region_name;
-
-            # if matched name is different to query name, skip fuzzy matching
-            if ( $matched_name ne $seq_region_name ) {
-
-              # print "DEBUG: Found '$seq_region_name' to be a synonym. Now using: '$matched_name'\n";
-              $seq_region_name = $matched_name;
-
-            } 
-          } else { # if no slice object with a match returned, try using a fuzzy match
-
-              # otherwise, if requested, try to do a fuzzy match
-              if (!$no_fuzz) {
-
-                my $fuzzy_matched_name = $self->fetch_by_fuzzy_matching( $cs, $version, $seq_region_name );
-
-                # check if this fuzzy-matched name has karyotype attribs
-                if (exists $cs->{'karyotype_cache'}{$fuzzy_matched_name}) {
-                  $seq_region_name = $fuzzy_matched_name;
-                } else {
-                  throw("The requested seq_region_name ('$fuzzy_matched_name') does not have associated karyotype attributes in this coordinate system.\n");
-                }
-
-              } else {
-                throw("No match found to $seq_region_name. Set fuzzy match to true to use this additional type of search...\n");
-              }
-          }
-        }
-          # exit;
-
-
-
-        # check that the requested slice has associated karyotype attribs
-        my $code = $cs->{'karyotype_cache'}{$seq_region_name}{'code'};
-        if ( !$cs->{'karyotype_cache'}{$seq_region_name}{'code'} ) {
-          throw("The requested slice does not have chromosome attributes.\n");
-        }
+        
       } else {
         throw( sprintf( "Unknown coordinate system:\n"
                   . "name='%s' version='%s' seq region name='%s'\n",
