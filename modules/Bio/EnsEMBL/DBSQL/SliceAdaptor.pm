@@ -296,9 +296,9 @@ sub fetch_by_region {
       # deal with cases where a coordsystem might not be defined by user
       my $slice;
       if (!defined $cs) {
-        $slice = $self->_fetch_by_seq_region_synonym( undef, undef, $seq_region_name, $start, $end, $strand, $version, $no_fuzz );
+        $slice = $self->_fetch_by_seq_region_synonym( undef, $seq_region_name, $start, $end, $strand, $version, $no_fuzz );
       } else {
-        $slice = $self->_fetch_by_seq_region_synonym( $cs, $cs->name(), $seq_region_name, $start, $end, $strand, $version, $no_fuzz );
+        $slice = $self->_fetch_by_seq_region_synonym( $cs, $seq_region_name, $start, $end, $strand, $version, $no_fuzz );
       }
 
       # check whether any slice data has been returned
