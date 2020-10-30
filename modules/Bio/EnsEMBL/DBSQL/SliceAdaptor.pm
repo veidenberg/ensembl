@@ -322,7 +322,7 @@ sub fetch_by_region {
         # otherwise, if requested, try to do a fuzzy match
         if (!$no_fuzz) {
 
-          my ($fuzzy_matched_name, $cs) = $self->_fetch_by_fuzzy_matching( $cs, $version, $seq_region_name, $sql, $constraint, \@bind_params );
+          my ($fuzzy_matched_name, $cs) = $self->_fetch_by_fuzzy_matching( $cs, $seq_region_name, $sql, $constraint, \@bind_params );
 
           if (!$fuzzy_matched_name) {
             return;
