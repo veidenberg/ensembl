@@ -298,9 +298,9 @@ sub fetch_by_region {
       # deal with cases where a coordsystem might not be defined by user
       my $slice;
       if (!defined $cs) {
-        $slice = $self->fetch_by_seq_region_synonym( undef, undef, $seq_region_name, $start, $end, $strand, $version, $no_fuzz );
+        $slice = $self->_fetch_by_seq_region_synonym( undef, undef, $seq_region_name, $start, $end, $strand, $version, $no_fuzz );
       } else {
-        $slice = $self->fetch_by_seq_region_synonym( $cs, $cs->name(), $seq_region_name, $start, $end, $strand, $version, $no_fuzz );
+        $slice = $self->_fetch_by_seq_region_synonym( $cs, $cs->name(), $seq_region_name, $start, $end, $strand, $version, $no_fuzz );
       }
 
       # check whether any slice data has been returned
@@ -329,7 +329,7 @@ sub fetch_by_region {
         if (!$no_fuzz) {
 
           print "Look for a fuzzy match using $cs, $version, $seq_region_name...\n";
-          my ($fuzzy_matched_name, $cs) = $self->fetch_by_fuzzy_matching( $cs, $version, $seq_region_name, $sql, $constraint, \@bind_params );
+          my ($fuzzy_matched_name, $cs) = $self->_fetch_by_fuzzy_matching( $cs, $version, $seq_region_name, $sql, $constraint, \@bind_params );
 
           if (!$fuzzy_matched_name) {
             print "No fuzzy match found for '$seq_region_name'.\n";
@@ -2669,7 +2669,7 @@ sub _build_circular_slice_cache {
 
 =head2 _fetch_by_seq_region_synonym
   Args       : $cs, $seq_region_name, $start, $end, $strand, $version, $no_fuzz
-  Example    : $self->fetch_by_seq_region_synonym( $cs, $seq_region_name, $start, $end, $strand, $version, $no_fuzz );
+  Example    : $self->_fetch_by_seq_region_synonym( $cs, $seq_region_name, $start, $end, $strand, $version, $no_fuzz );
   Description: fetches all the seq region synonyms (or uses wildcard) when requested
   Returntype : Bio::EnsEMBL::SliceAdaptor, or none 
   Exceptions : None
@@ -2745,7 +2745,7 @@ sub _fetch_by_seq_region_synonym {
   
 =head2 _fetch_by_fuzzy_matching
   Args       : $cs, $seq_region_name, $sql, $constraint, $bind_params
-  Example    : my $fuzzy_matched_name = $self->fetch_by_fuzzy_matching( $cs, $seq_region_name, $sql, $constraint, $bind_params );
+  Example    : my $fuzzy_matched_name = $self->_fetch_by_fuzzy_matching( $cs, $seq_region_name, $sql, $constraint, $bind_params );
   Description: fetches all the fuzzy matches for a given seq_region_name when requested
   Returntype : string, Bio::EnsEMBL::CoordSystem
   Exceptions : None
