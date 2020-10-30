@@ -293,8 +293,6 @@ sub fetch_by_region {
 
     unless ( @row ) {
 
-      print "Look for a synonymous seq_region_name that could be used...\n";
-
       # deal with cases where a coordsystem might not be defined by user
       my $slice;
       if (!defined $cs) {
@@ -311,7 +309,6 @@ sub fetch_by_region {
         # if matched name is different to query name, skip fuzzy matching
         if ( $matched_name ne $seq_region_name ) {
 
-          print "DEBUG: Found '$seq_region_name' to be a synonym. Now using: '$matched_name'\n";
           $seq_region_name = $matched_name;
 
           # define $arr
@@ -323,16 +320,12 @@ sub fetch_by_region {
 
       } else { # if no slice object with a match returned, try using a fuzzy match
 
-        print "Using fuzzy match to search for a suitable name, if requested\n";
-        
         # otherwise, if requested, try to do a fuzzy match
         if (!$no_fuzz) {
 
-          print "Look for a fuzzy match using $cs, $version, $seq_region_name...\n";
           my ($fuzzy_matched_name, $cs) = $self->_fetch_by_fuzzy_matching( $cs, $version, $seq_region_name, $sql, $constraint, \@bind_params );
 
           if (!$fuzzy_matched_name) {
-            print "No fuzzy match found for '$seq_region_name'.\n";
             return;
           }
 
@@ -343,13 +336,10 @@ sub fetch_by_region {
 
             $arr = $self->{'sr_name_cache'}->{$tmp_key_string};
             $length = $arr->[3];
-            print "length = $length\n";
           } else {
-            print "The fuzzy-matched seq_region_name ('$fuzzy_matched_name') does not have cached name info.\n";
             return;
           }
         } else {
-          print "Fuzzy match set to false. Set fuzzy match to true to use this additional type of search...\n";
           return;
         }
       }
